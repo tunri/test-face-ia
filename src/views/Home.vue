@@ -63,25 +63,40 @@
 						></v-progress-circular>
 					</div>
 					<template v-else>
-						<v-alert
-							border="left"
-							colored-border
-							:color="result.color"
-							elevation="2"
-							v-if="result"
-						>
+						<v-alert border="left" colored-border elevation="2" v-if="response">
 							<v-card elevation="0">
-								<v-card-title :class="`pt-0 ${result.color}--text`">
-									{{ result.title }}
-								</v-card-title>
+								<v-card-title :class="`pt-0`"> Resultado </v-card-title>
 								<v-card-text>
-									<ul>
-										<li
-											class="body-1 black--text"
-											v-for="item in result.specs"
-											:key="item.id"
-										>
-											{{ item.text }}
+									<ul class="list-style-none pa-0">
+										<li>
+											<ItemValidationVue :isCorrect="response.bg_white">
+												Fondo Blanco
+											</ItemValidationVue>
+										</li>
+										<li>
+											<ItemValidationVue :isCorrect="response.face_centered">
+												Rostro centrado y de frente
+											</ItemValidationVue>
+										</li>
+										<li>
+											<ItemValidationVue :isCorrect="response.face_found">
+												Rostro encontrado
+											</ItemValidationVue>
+										</li>
+										<li>
+											<ItemValidationVue :isCorrect="response.mouth_open">
+												Boca abierta
+											</ItemValidationVue>
+										</li>
+										<li>
+											<ItemValidationVue :isCorrect="response.glassses_on">
+												Rostro tiene lentes
+											</ItemValidationVue>
+										</li>
+										<li>
+											<ItemValidationVue :isCorrect="validDimensions">
+												No tiene dimensiones correctas
+											</ItemValidationVue>
 										</li>
 									</ul>
 								</v-card-text>
@@ -89,43 +104,49 @@
 						</v-alert>
 					</template>
 				</v-col>
+				<!-- <v-col cols="12">
+					<form
+						action="http://35.206.106.108:5000/"
+						method="post"
+						enctype="multipart/form-data"
+					>
+						<input type="file" name="file" />
+						<button type="submit">Submit</button>
+					</form>
+				</v-col> -->
 			</v-row>
 		</v-container>
 	</div>
 </template>
 
 <script>
-// import axios from "axios";
+import ItemValidationVue from "./ItemValidation.vue";
 
-const DATA = {
-	validation: false,
-	specs: [
-		{
-			id: 1,
-			text: "Fondo no es blanco",
-		},
-		{
-			id: 2,
-			text: "Rostro no esta centrado",
-		},
-		{
-			id: 3,
-			text: "Rostro tiene lentes",
-		},
-	],
-};
+import axios from "axios";
 
 export default {
 	name: "Home",
 
-	components: {},
+	components: { ItemValidationVue },
 
 	data: () => ({
 		previewImage: null,
 		color: null,
 		loading: false,
 		result: null,
+		file: null,
+		response: {},
+		maxWidth: 600,
+		maxHeight: 600,
+		maxSize: 600 * 1024,
 	}),
+
+	computed: {
+		validDimensions() {
+			const { width, height } = this.response;
+			return width <= this.maxWidth && height <= this.maxHeight;
+		},
+	},
 
 	methods: {
 		async onSubmit() {
@@ -134,15 +155,7 @@ export default {
 				this.result = null;
 				try {
 					const Response = await this.request();
-					const data = {};
-
-					data.title = Response.validation
-						? "La foto cumple las validaciones"
-						: "No cumple validación";
-					data.specs = Response.specs;
-					data.color = Response.validation ? "success" : "error";
-
-					this.result = { ...data };
+					this.response = Response;
 				} catch (error) {
 					console.log(error);
 				} finally {
@@ -154,6 +167,7 @@ export default {
 			this.$refs.uploader.click();
 		},
 		onFileChanged(e) {
+			this.file = e.target.files[0];
 			this.createImage(e.target.files[0]);
 		},
 		createImage(file) {
@@ -166,7 +180,14 @@ export default {
 			reader.readAsDataURL(file);
 		},
 		request() {
-			return new Promise((resolve) => setTimeout(resolve, 2000, DATA));
+			const bodyFormData = new FormData();
+			bodyFormData.append("file", this.file);
+			return axios.post("http://35.206.106.108:5000/", bodyFormData, {
+				headers: {
+					Accept: "text/html",
+					"Content-Type": "application/x-www-form-urlencoded",
+				},
+			});
 		},
 	},
 };
@@ -174,5 +195,8 @@ export default {
 <style lang="scss">
 .mf-container {
 	max-width: 1064px;
+}
+.list-style-none {
+	list-style: none;
 }
 </style>
