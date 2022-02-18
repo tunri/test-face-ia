@@ -1,5 +1,5 @@
 <template>
-	<div class="py-8">
+	<form>
 		<v-container class="mf-container">
 			<v-row>
 				<v-col cols="12">
@@ -89,13 +89,13 @@
 											</ItemValidationVue>
 										</li>
 										<li>
-											<ItemValidationVue :isCorrect="response.glasses_on">
+											<ItemValidationVue :isCorrect="response.glassses_on">
 												Rostro tiene lentes
 											</ItemValidationVue>
 										</li>
 										<li>
 											<ItemValidationVue :isCorrect="validDimensions">
-												tiene dimensiones correctas
+												No tiene dimensiones correctas
 											</ItemValidationVue>
 										</li>
 									</ul>
@@ -116,88 +116,13 @@
 				</v-col> -->
 			</v-row>
 		</v-container>
-	</div>
+	</form>
 </template>
 
 <script>
-import ItemValidationVue from "./ItemValidation.vue";
-
-import axios from "axios";
-
 export default {
-	name: "Home",
-
-	components: { ItemValidationVue },
-
-	data: () => ({
-		previewImage: null,
-		color: null,
-		loading: false,
-		result: null,
-		file: null,
-		response: {},
-		maxWidth: 600,
-		maxHeight: 600,
-		maxSize: 600 * 1024,
-	}),
-
-	computed: {
-		validDimensions() {
-			const { width, height } = this.response;
-			return width <= this.maxWidth && height <= this.maxHeight;
-		},
-	},
-
-	methods: {
-		async onSubmit() {
-			if (this.previewImage) {
-				this.loading = true;
-				this.result = null;
-				try {
-					const Response = await this.request();
-					this.response = Response.data;
-                    console.log(this.response)
-				} catch (error) {
-					console.log(error);
-				} finally {
-					this.loading = false;
-				}
-			}
-		},
-		handleFileImport() {
-			this.$refs.uploader.click();
-		},
-		onFileChanged(e) {
-			this.file = e.target.files[0];
-			this.createImage(e.target.files[0]);
-		},
-		createImage(file) {
-			const reader = new FileReader();
-
-			reader.onload = (e) => {
-				this.previewImage = e.target.result;
-			};
-
-			reader.readAsDataURL(file);
-		},
-		request() {
-			const bodyFormData = new FormData();
-			bodyFormData.append("file", this.file);
-			return axios.post("http://35.206.106.108:5000/", bodyFormData, {
-				headers: {
-					Accept: "text/html",
-					"Content-Type": "application/x-www-form-urlencoded",
-				},
-			});
-		},
-	},
+	name: "Validation",
 };
 </script>
-<style lang="scss">
-.mf-container {
-	max-width: 1064px;
-}
-.list-style-none {
-	list-style: none;
-}
-</style>
+
+<style></style>
