@@ -181,7 +181,7 @@ export default {
 		request() {
 			const bodyFormData = new FormData();
 			bodyFormData.append("file", this.file);
-			return axios.post("http://35.206.106.108:5000/", bodyFormData, {
+			return axios.post("http://35.208.36.72:5000/", bodyFormData, {
 				headers: {
 					Accept: "text/html",
 					"Content-Type": "application/x-www-form-urlencoded",
