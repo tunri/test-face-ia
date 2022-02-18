@@ -2,30 +2,6 @@
 	<div class="py-8">
 		<v-container class="mf-container">
 			<v-row>
-				<v-col cols="12">
-					<v-card class="pa-6" color="#eaeaea" elevation="0">
-						<v-card-title>
-							Validador de Fotos con Inteligencia Artificial
-						</v-card-title>
-						<v-card-text>
-							<p>
-								Esta aplicación tiene un algoritmo de Inteligencia Artificial
-								desarrollado a tráves de un modelo de Machine Learning
-								previamente entrenado. Puede validar las siguientes
-								caracteristicas:
-							</p>
-							<ul>
-								<li>Validación de tamaño entre 50 y 600 KB</li>
-								<li>Dimensiones máximas de 600x600 pixeles</li>
-								<li>Validación de fondo blanco</li>
-								<li>Validación de rostro centrado y de frente</li>
-								<li>Validación de gestos</li>
-								<li>Validación de boca abierta</li>
-								<li>Validación de sombrea en los ojos</li>
-							</ul>
-						</v-card-text>
-					</v-card>
-				</v-col>
 				<v-col cols="6">
 					<v-row>
 						<v-col cols="12">
@@ -68,32 +44,37 @@
 								<v-card-title :class="`pt-0`"> Resultado </v-card-title>
 								<v-card-text>
 									<ul class="list-style-none pa-0">
-										<li>
+										<li v-if="isSubmitted">
 											<ItemValidationVue :isCorrect="response.bg_white">
 												Fondo Blanco
 											</ItemValidationVue>
 										</li>
-										<li>
+										<li v-if="isSubmitted">
 											<ItemValidationVue :isCorrect="response.face_centered">
 												Rostro centrado y de frente
 											</ItemValidationVue>
 										</li>
-										<li>
+										<li v-if="isSubmitted">
 											<ItemValidationVue :isCorrect="response.face_found">
 												Rostro encontrado
 											</ItemValidationVue>
 										</li>
-										<li>
+										<li v-if="isSubmitted">
 											<ItemValidationVue :isCorrect="response.mouth_open">
 												Boca abierta
 											</ItemValidationVue>
 										</li>
-										<li>
-											<ItemValidationVue :isCorrect="response.glasses_on">
+										<li v-if="isSubmitted">
+											<div class="body-1 black--text">
+												<v-icon color="success">mdi-check-bold</v-icon>
+												Rostro <span v-if="!response.glasses_on">no </span>tiene
+												lentes
+											</div>
+											<!-- <ItemValidationVue :isCorrect="response.glasses_on">
 												Rostro tiene lentes
-											</ItemValidationVue>
+											</ItemValidationVue> -->
 										</li>
-										<li>
+										<li v-if="isSubmitted">
 											<ItemValidationVue :isCorrect="validDimensions">
 												tiene dimensiones correctas
 											</ItemValidationVue>
@@ -104,16 +85,30 @@
 						</v-alert>
 					</template>
 				</v-col>
-				<!-- <v-col cols="12">
-					<form
-						action="http://35.206.106.108:5000/"
-						method="post"
-						enctype="multipart/form-data"
-					>
-						<input type="file" name="file" />
-						<button type="submit">Submit</button>
-					</form>
-				</v-col> -->
+				<v-col cols="12">
+					<v-card class="pa-6" color="#eaeaea" elevation="0">
+						<v-card-title>
+							Validador de Fotos con Inteligencia Artificial
+						</v-card-title>
+						<v-card-text>
+							<p>
+								Esta aplicación tiene un algoritmo de Inteligencia Artificial
+								desarrollado a tráves de un modelo de Machine Learning
+								previamente entrenado. Puede validar las siguientes
+								caracteristicas:
+							</p>
+							<ul>
+								<li>Validación de tamaño entre 50 y 600 KB</li>
+								<li>Dimensiones máximas de 600x600 pixeles</li>
+								<li>Validación de fondo blanco</li>
+								<li>Validación de rostro centrado y de frente</li>
+								<li>Validación de gestos</li>
+								<li>Validación de boca abierta</li>
+								<li>Validación de sombrea en los ojos</li>
+							</ul>
+						</v-card-text>
+					</v-card>
+				</v-col>
 			</v-row>
 		</v-container>
 	</div>
@@ -139,6 +134,7 @@ export default {
 		maxWidth: 600,
 		maxHeight: 600,
 		maxSize: 600 * 1024,
+		isSubmitted: false,
 	}),
 
 	computed: {
@@ -150,13 +146,14 @@ export default {
 
 	methods: {
 		async onSubmit() {
+			this.isSubmitted = true;
 			if (this.previewImage) {
 				this.loading = true;
 				this.result = null;
 				try {
 					const Response = await this.request();
 					this.response = Response.data;
-                    console.log(this.response)
+					console.log(this.response);
 				} catch (error) {
 					console.log(error);
 				} finally {
@@ -168,6 +165,7 @@ export default {
 			this.$refs.uploader.click();
 		},
 		onFileChanged(e) {
+			this.isSubmitted = false;
 			this.file = e.target.files[0];
 			this.createImage(e.target.files[0]);
 		},

@@ -7,13 +7,12 @@
 					contain
 					:src="require('@/assets/logo-antamina.png')"
 					transition="scale-transition"
-                    width="56"
+					width="56"
 				/>
 			</div>
-
 			<v-spacer></v-spacer>
-
-			<v-btn depressed color="error"> salir </v-btn>
+			<h3>Validador de Fotos con Inteligencia Artificial</h3>
+            <v-spacer></v-spacer>
 		</v-app-bar>
 
 		<v-main>
@@ -22,7 +21,7 @@
 
 		<v-footer padless>
 			<v-col class="text-center" cols="12">
-				{{ new Date().getFullYear() }} — <strong>Vuetify</strong>
+				{{ new Date().getFullYear() }} <strong></strong>
 			</v-col>
 		</v-footer>
 	</v-app>
